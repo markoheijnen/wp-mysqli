@@ -1,5 +1,5 @@
 === MySQLi database layer ===
-Contributors: markoheijnen
+Contributors: CodeKitchen, markoheijnen
 Tags: database, backend
 Requires at least: 3.6
 Tested up to: 3.6
