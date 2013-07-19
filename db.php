@@ -75,10 +75,9 @@ class wpdb_mysqli extends wpdb {
 	}
 
 	/**
-	 * Real escape, using mysqli_real_escape_string() or addslashes()
+	 * Real escape, using mysqli_real_escape_string()
 	 *
 	 * @see mysqli_real_escape_string()
-	 * @see addslashes()
 	 * @since 2.8.0
 	 * @access private
 	 *
@@ -86,10 +85,7 @@ class wpdb_mysqli extends wpdb {
 	 * @return string escaped
 	 */
 	function _real_escape( $string ) {
-		if ( $this->dbh && $this->real_escape )
-			return mysqli_real_escape_string( $this->dbh, $string );
-		else
-			return addslashes( $string );
+		return mysqli_real_escape_string( $this->dbh, $string );
 	}
 
 	/**
