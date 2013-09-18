@@ -86,10 +86,12 @@ class wpdb_mysqli extends wpdb {
 	 * @return string escaped
 	 */
 	function _real_escape( $string ) {
-		if ( $this->dbh && $this->real_escape )
-			return mysqli_real_escape_string( $this->dbh, $string );
-		else
-			return addslashes( $string );
+		if ( $this->dbh )
+			return mysqli_real_escape_string( $string, $this->dbh );
+
+		$class = get_class( $this );
+		_doing_it_wrong( $class, "$class must set a database connection for use with escaping.", E_USER_NOTICE );
+		return addslashes( $string );
 	}
 
 	/**
@@ -214,7 +216,14 @@ class wpdb_mysqli extends wpdb {
 		if ( ! $this->ready )
 			return false;
 
-		// some queries are made before the plugins have been loaded, and thus cannot be filtered with this method
+		/**
+		 * Filter the database query.
+		 *
+		 * Some queries are made before the plugins have been loaded, and thus cannot be filtered with this method.
+		 *
+		 * @since 2.1.0
+		 * @param string $query Database query.
+		*/
 		$query = apply_filters( 'query', $query );
 
 		$return_val = 0;
@@ -237,6 +246,10 @@ class wpdb_mysqli extends wpdb {
 
 		// If there is an error then take note of it..
 		if ( $this->last_error = mysqli_error( $this->dbh ) ) {
+			// Clear insert_id on a subsequent failed insert.
+			if ( $this->insert_id && preg_match( '/^\s*(insert|replace)\s/i', $query ) )
+				$this->insert_id = 0;
+
 			$this->print_error();
 			return false;
 		}
