@@ -75,10 +75,9 @@ class wpdb_mysqli extends wpdb {
 	}
 
 	/**
-	 * Real escape, using mysqli_real_escape_string() or addslashes()
+	 * Real escape, using mysqli_real_escape_string()
 	 *
 	 * @see mysqli_real_escape_string()
-	 * @see addslashes()
 	 * @since 2.8.0
 	 * @access private
 	 *
@@ -87,7 +86,7 @@ class wpdb_mysqli extends wpdb {
 	 */
 	function _real_escape( $string ) {
 		if ( $this->dbh )
-			return mysqli_real_escape_string( $string, $this->dbh );
+			return mysqli_real_escape_string( $this->dbh, $string );
 
 		$class = get_class( $this );
 		_doing_it_wrong( $class, "$class must set a database connection for use with escaping.", E_USER_NOTICE );
