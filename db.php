@@ -60,7 +60,9 @@ class wpdb_mysqli extends wpdb {
 				return;
 			}
 
-			$modes_str = mysql_result( $res, 0 );
+			$res->data_seek(0);
+			$datarow   = $res->fetch_array();
+    		$modes_str = $datarow[0];
 
 			if ( empty( $modes_str ) ) {
 				return;
