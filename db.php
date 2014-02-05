@@ -55,7 +55,7 @@ class wpdb_mysqli extends wpdb {
 	 */
 	function set_sql_mode( $modes = array() ) {
 		if ( empty( $modes ) ) {
-			$res = mysqli_query( 'SELECT @@SESSION.sql_mode;', $this->dbh );
+			$res = mysqli_query( $this->dbh, 'SELECT @@SESSION.sql_mode;' );
 			if ( empty( $res ) ) {
 				return;
 			}
@@ -90,7 +90,7 @@ class wpdb_mysqli extends wpdb {
 
 		$modes_str = implode( ',', $modes );
 
-		mysqli_query( "SET SESSION sql_mode='$modes_str';", $this->dbh );
+		mysqli_query( $this->dbh, "SET SESSION sql_mode='$modes_str';" );
 	}
 
 	/**
