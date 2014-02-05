@@ -44,6 +44,56 @@ class wpdb_mysqli extends wpdb {
 	}
 
 	/**
+	 * Change the current SQL mode, and ensure its WordPress compatibility.
+	 *
+	 * If no modes are passed, it will ensure the current MySQL server
+	 * modes are compatible.
+	 *
+	 * @since 3.9.0
+	 *
+	 * @param array $modes Optional. A list of SQL modes to set.
+	 */
+	function set_sql_mode( $modes = array() ) {
+		if ( empty( $modes ) ) {
+			$res = mysqli_query( 'SELECT @@SESSION.sql_mode;', $this->dbh );
+			if ( empty( $res ) ) {
+				return;
+			}
+
+			$modes_str = mysql_result( $res, 0 );
+
+			if ( empty( $modes_str ) ) {
+				return;
+			}
+
+			$modes = explode( ',', $modes_str );
+		}
+
+		$modes = array_change_key_case( $modes, CASE_UPPER );
+
+		/**
+		 * Filter the list of incompatible SQL modes to exclude.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @see wpdb::$incompatible_modes
+		 *
+		 * @param array $incompatible_modes An array of incompatible modes
+		 */
+		$incompatible_modes = (array) apply_filters( 'incompatible_sql_modes', $this->incompatible_modes );
+
+		foreach( $modes as $i => $mode ) {
+			if ( in_array( $mode, $incompatible_modes ) ) {
+				unset( $modes[ $i ] );
+			}
+		}
+
+		$modes_str = implode( ',', $modes );
+
+		mysqli_query( "SET SESSION sql_mode='$modes_str';", $this->dbh );
+	}
+
+	/**
 	 * Selects a database using the current database connection.
 	 *
 	 * The database name will be changed based on the current database
@@ -85,12 +135,7 @@ class wpdb_mysqli extends wpdb {
 	 * @return string escaped
 	 */
 	function _real_escape( $string ) {
-		if ( $this->dbh )
-			return mysqli_real_escape_string( $this->dbh, $string );
-
-		$class = get_class( $this );
-		_doing_it_wrong( $class, "$class must set a database connection for use with escaping.", E_USER_NOTICE );
-		return addslashes( $string );
+		return mysqli_real_escape_string( $this->dbh, $string );
 	}
 
 	/**
@@ -227,14 +272,7 @@ class wpdb_mysqli extends wpdb {
 		if ( ! $this->ready )
 			return false;
 
-		/**
-		 * Filter the database query.
-		 *
-		 * Some queries are made before the plugins have been loaded, and thus cannot be filtered with this method.
-		 *
-		 * @since 2.1.0
-		 * @param string $query Database query.
-		*/
+		// some queries are made before the plugins have been loaded, and thus cannot be filtered with this method
 		$query = apply_filters( 'query', $query );
 
 		$return_val = 0;
@@ -257,10 +295,6 @@ class wpdb_mysqli extends wpdb {
 
 		// If there is an error then take note of it..
 		if ( $this->last_error = mysqli_error( $this->dbh ) ) {
-			// Clear insert_id on a subsequent failed insert.
-			if ( $this->insert_id && preg_match( '/^\s*(insert|replace)\s/i', $query ) )
-				$this->insert_id = 0;
-
 			$this->print_error();
 			return false;
 		}
