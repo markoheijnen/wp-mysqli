@@ -165,7 +165,7 @@ class wpdb_mysqli extends wpdb {
 	 *
 	 * @since 3.0.0
 	 */
-	function db_connect() {
+	function db_connect( $allow_bail = true ) {
 
 		$this->is_mysql = true;
 
@@ -178,8 +178,15 @@ class wpdb_mysqli extends wpdb {
 			$this->dbh = @mysqli_connect( $this->dbhost, $this->dbuser, $this->dbpassword );
 		}
 
-		if ( ! $this->dbh ) {
+		if ( ! $this->dbh && $allow_bail ) {
 			wp_load_translations_early();
+
+			// Load custom DB error template, if present.
+			if ( file_exists( WP_CONTENT_DIR . '/db-error.php' ) ) {
+				require_once( WP_CONTENT_DIR . '/db-error.php' );
+				die();
+			}
+
 			$this->bail( sprintf( __( "
 <h1>Error establishing a database connection</h1>
 <p>This either means that the username and password information in your <code>wp-config.php</code> file is incorrect or we can't contact the database server at <code>%s</code>. This could mean your host's database server is down.</p>
@@ -191,14 +198,19 @@ class wpdb_mysqli extends wpdb {
 <p>If you're unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href='http://wordpress.org/support/'>WordPress Support Forums</a>.</p>
 " ), htmlspecialchars( $this->dbhost, ENT_QUOTES ) ), 'db_connect_fail' );
 
-			return;
+			return false;
+		}
+		else if ( $this->dbh ) {
+			$this->set_charset( $this->dbh );
+			$this->set_sql_mode();
+			$this->ready = true;
+
+			$this->select( $this->dbname, $this->dbh );
+
+			return true;
 		}
 
-		$this->set_charset( $this->dbh );
-
-		$this->ready = true;
-
-		$this->select( $this->dbname, $this->dbh );
+		return false;
 	}
 
 	/**
