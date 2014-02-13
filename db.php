@@ -50,10 +50,16 @@ class wpdb_mysqli extends wpdb {
 	 * modes are compatible.
 	 *
 	 * @since 3.9.0
+	 * @global string $wp_version The WordPress version string
 	 *
 	 * @param array $modes Optional. A list of SQL modes to set.
 	 */
 	function set_sql_mode( $modes = array() ) {
+		global $wp_version;
+
+		if ( version_compare( $wp_version, '3.9', '<' ) )
+			return;
+
 		if ( empty( $modes ) ) {
 			$res = mysqli_query( $this->dbh, 'SELECT @@SESSION.sql_mode;' );
 			if ( empty( $res ) ) {
