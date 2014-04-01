@@ -15,8 +15,21 @@ if ( !defined( 'ABSPATH' ) ) {
 class MySQLi_Manager {
 
 	public function __construct() {
+		add_action( 'init', array( $this, 'deactivate_when_not_needed' ), 1 );
 		add_action( 'admin_menu', array( $this, 'add_page' ) );
 	}
+
+
+	public function deactivate_when_not_needed() {
+		global $wpdb, $wp_version;
+		if ( version_compare( $wp_version, '3.9-alpha-27234', '>=' ) && $wpdb->use_mysqli ) {
+			if ( is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
+				require_once ABSPATH . '/wp-admin/includes/plugin.php';
+			    wp_die( sprintf( __('MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5. <a href="%s">Go back</a>', 'mysqli'), admin_url('/') ) );
+			}
+		}
+	}
+
 
 	/**
 	 * Try to delete the custom db.php drop-in.  This doesn't use the
