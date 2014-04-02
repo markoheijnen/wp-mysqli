@@ -25,6 +25,7 @@ class MySQLi_Manager {
 		if ( version_compare( $wp_version, '3.9-alpha-27234', '>=' ) && $wpdb->use_mysqli ) {
 			if ( is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
 				require_once ABSPATH . '/wp-admin/includes/plugin.php';
+				deactivate_plugins( __FILE__ );
 			    wp_die( sprintf( __('MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5. <a href="%s">Go back</a>', 'mysqli'), admin_url('/') ) );
 			}
 		}
