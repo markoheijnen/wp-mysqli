@@ -76,8 +76,11 @@ class MySQLi_Manager {
 	}
 
 	public function page_overview() {
-		if ( ! current_user_can( 'manage_options' ) )
+		global $wp_version;
+
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+		}
 
 		echo '<div class="wrap">';
 
@@ -110,11 +113,18 @@ class MySQLi_Manager {
 				return true;
 			} else {
 				// Once we get here, we should have credentials, do the file system operations
-				global $wp_filesystem;
+				global $wp_filesystem, $wp_version;
 
 				// Install
 				if ( $do_install ) {
-					if ( $wp_filesystem->put_contents( $wp_filesystem->wp_content_dir() . '/db.php' , file_get_contents( dirname( __FILE__ ) .'/db.php' ), FS_CHMOD_FILE ) ) {
+					if ( version_compare( $wp_version, '3.9-alpha-27234', '<' ) ) {
+						$db_content = file_get_contents( dirname( __FILE__ ) .'/db-legacy.php' );
+					}
+					else {
+						$db_content = file_get_contents( dirname( __FILE__ ) .'/db.php' );
+					}
+
+					if ( $wp_filesystem->put_contents( $wp_filesystem->wp_content_dir() . '/db.php', $db_content, FS_CHMOD_FILE ) ) {
 						echo '<div class="updated"><p><strong>' . __( 'db.php has been installed.', 'mysqli' ) .'</strong></p></div>';
 					} else {
 						echo '<div class="error"><p><strong>' . __( "db.php couldn't be installed. Please try is manually", 'mysqli' ) .'</strong></p></div>';
@@ -136,7 +146,13 @@ class MySQLi_Manager {
 		echo '<p>' . __( "The button below let's you install/remove the MySQLi drive" ) . '</p>';
 
 		if( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
-			$crc1 = md5_file( dirname( __FILE__ ) . '/db.php' );
+			if ( version_compare( $wp_version, '3.9-alpha-27234', '<' ) ) {
+				$crc1 = md5_file( dirname( __FILE__ ) . '/db-legacy.php' );
+			}
+			else {
+				$crc1 = md5_file( dirname( __FILE__ ) . '/db.php' );
+			}
+
 			$crc2 = md5_file( WP_CONTENT_DIR . '/db.php' );
 
 			if ( $crc1 === $crc2 ) {
