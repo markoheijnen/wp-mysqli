@@ -8,7 +8,7 @@ Text Domain: mysqli
 Version: 1.1
 */
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
@@ -97,21 +97,21 @@ class MySQLi_Manager {
 		$url = $_SERVER['REQUEST_URI'];
 
 		// Install flags
-		$do_install = ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'install-db-nonce' ) );
+		$do_install   = ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'install-db-nonce' ) );
 		$do_uninstall = ( isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'uninstall-db-nonce' ) );
 
 		if ( $do_install || $do_uninstall ) {
 
 			// Ask for credentials, if necessary
 			if ( false === ( $creds = request_filesystem_credentials( $url, $method, false, false, $form_fields ) ) ) {
-
 				return true;
-			} elseif ( ! WP_Filesystem($creds) ) {
-
+			}
+			elseif ( ! WP_Filesystem($creds) ) {
 				// The credentials are bad, ask again
 				request_filesystem_credentials( $url, $method, true, false, $form_fields );
 				return true;
-			} else {
+			}
+			else {
 				// Once we get here, we should have credentials, do the file system operations
 				global $wp_filesystem, $wp_version;
 
@@ -126,15 +126,17 @@ class MySQLi_Manager {
 
 					if ( $wp_filesystem->put_contents( $wp_filesystem->wp_content_dir() . '/db.php', $db_content, FS_CHMOD_FILE ) ) {
 						echo '<div class="updated"><p><strong>' . __( 'db.php has been installed.', 'mysqli' ) .'</strong></p></div>';
-					} else {
+					}
+					else {
 						echo '<div class="error"><p><strong>' . __( "db.php couldn't be installed. Please try is manually", 'mysqli' ) .'</strong></p></div>';
 					}
-
+				}
 				// Remove
-				} elseif ( $do_uninstall ) {
+				elseif ( $do_uninstall ) {
 					if ( $wp_filesystem->delete( $wp_filesystem->wp_content_dir() . '/db.php' ) ) {
 						echo '<div class="updated"><p><strong>' . __( 'db.php has been removed.', 'mysqli' ) .'</strong></p></div>';
-					} else {
+					}
+					else {
 						echo '<div class="error"><p><strong>' . __( "db.php couldn't be removed. Please try is manually", 'mysqli' ) .'</strong></p></div>';
 					}
 
@@ -161,14 +163,16 @@ class MySQLi_Manager {
 
 				echo '<p>';
 
-				if( function_exists( 'mysql' ) )
+				if( function_exists( 'mysql' ) ) {
 					submit_button( __( 'Remove', 'mysqli' ), 'primary', 'install-db-php', false );
+				}
 
 				echo '</p>';
 
 				echo '</form>';
 
-			} else {
+			}
+			else {
 				echo '<form method="post" style="display: inline;">';
 				wp_nonce_field('install-db-nonce');
 
@@ -189,13 +193,13 @@ class MySQLi_Manager {
 
 			echo '</form>';
 		}
-
 	}
 
 }
 
-if( is_admin() )
+if ( is_admin() ) {
 	new MySQLi_Manager;
+}
 
 register_deactivation_hook( __FILE__, array( 'MySQLi_Manager', 'deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'MySQLi_Manager', 'uninstall' ) );
