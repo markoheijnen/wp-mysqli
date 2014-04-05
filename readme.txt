@@ -2,8 +2,8 @@
 Contributors: CodeKitchen, markoheijnen
 Tags: database, backend
 Requires at least: 3.6
-Tested up to: 3.6
-Stable tag: 1.1
+Tested up to: 3.9
+Stable tag: 1.2
 License: GPLv2 or later
 
 MySQL_* functions are deprecated and this plugin creates a layer to use MySQLi instead. So you don't get notices when using PHP 5.5

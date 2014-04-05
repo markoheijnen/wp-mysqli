@@ -5,7 +5,7 @@ Description: Enables MySQLi
 Author: Marko Heijnen
 Author URI: http://markoheijnen.com
 Text Domain: mysqli
-Version: 1.1
+Version: 1.2
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
