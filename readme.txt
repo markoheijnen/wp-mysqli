@@ -20,3 +20,9 @@ Be sure to read the installation instructions, as this is **not** a traditional 
 1. Verify that you have MySQLi
 2. Go to the settings page of this plugin and install our driver or just copy `db.php` to your WordPress content directory (`wp-content/` by default)
 3. Done!
+
+== Changelog ==
+
+= 1.2 ( 2014-04-07 ) =
+* WordPress 3.9 support what already has MySQLi support.
+* Code cleanup
