@@ -1,5 +1,5 @@
 <?php
 
-if ( ! defined('USE_EXT_MYSQL') ) {
-	define( 'USE_EXT_MYSQL', false );
+if ( ! defined( 'WP_USE_EXT_MYSQL' ) ) {
+	define( 'WP_USE_EXT_MYSQL', false );
 }
