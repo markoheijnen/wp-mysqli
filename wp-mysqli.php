@@ -23,7 +23,7 @@ class MySQLi_Manager {
 	public function deactivate_when_not_needed() {
 		global $wpdb, $wp_version;
 
-		if ( version_compare( $wp_version, '3.9-alpha-27234', '>=' ) && $wpdb->use_mysqli ) {
+		if ( version_compare( $wp_version, '3.9', '>=' ) && $wpdb->use_mysqli ) {
 			if ( is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
 				require_once ABSPATH . '/wp-admin/includes/plugin.php';
 				deactivate_plugins( __FILE__ );
