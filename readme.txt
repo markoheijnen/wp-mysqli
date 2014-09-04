@@ -23,7 +23,7 @@ Be sure to read the installation instructions, as this is **not** a traditional 
 
 == Changelog ==
 
-= 1.2 ( 2014-04-07 ) =
+= 1.2 ( 2014-09-04 ) =
 * WordPress 3.9 support what already has MySQLi support.
 * Code cleanup
 
