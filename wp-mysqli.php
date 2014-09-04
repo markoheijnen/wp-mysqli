@@ -28,7 +28,13 @@ class MySQLi_Manager {
 				require_once ABSPATH . '/wp-admin/includes/plugin.php';
 				deactivate_plugins( __FILE__ );
 
-				wp_die( sprintf( __('MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5. <a href="%s">Go back</a>', 'mysqli'), admin_url('/') ) );
+				wp_die(
+					__( 'MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5 and higher. And we are proudly to say that you do that, great job!', 'mysqli' ),
+					__( 'MySQLi got deactivated', 'mysqli' ),
+					array(
+						'back_link' => true
+					)
+				);
 			}
 		}
 	}
