@@ -27,7 +27,7 @@ Be sure to read the installation instructions, as this is **not** a traditional 
 * WordPress 3.9 support what already has MySQLi support.
 * Code cleanup
 
-= 1.1 ( 2014-09-18 ) =
+= 1.1 ( 2013-09-18 ) =
 * Updated to all changes in core.
 * Change _real_escape() method to always use mysqli_real_escape_string().
 
