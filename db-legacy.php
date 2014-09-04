@@ -26,18 +26,25 @@ class wpdb_mysqli extends wpdb {
 	 * @param string   $collate The collation (optional)
 	 */
 	function set_charset( $dbh, $charset = null, $collate = null ) {
-		if ( ! isset( $charset ) )
+		if ( ! isset( $charset ) ) {
 			$charset = $this->charset;
-		if ( ! isset( $collate ) )
+		}
+
+		if ( ! isset( $collate ) ) {
 			$collate = $this->collate;
+		}
+
 		if ( $this->has_cap( 'collation' ) && ! empty( $charset ) ) {
 			if ( function_exists( 'mysqli_set_charset' ) && $this->has_cap( 'set_charset' ) ) {
 				mysqli_set_charset( $dbh, $charset );
 				$this->real_escape = true;
 			} else {
 				$query = $this->prepare( 'SET NAMES %s', $charset );
-				if ( ! empty( $collate ) )
+
+				if ( ! empty( $collate ) ) {
 					$query .= $this->prepare( ' COLLATE %s', $collate );
+				}
+
 				mysqli_query( $dbh, $query );
 			}
 		}
@@ -84,7 +91,7 @@ class wpdb_mysqli extends wpdb {
 		 */
 		$incompatible_modes = (array) apply_filters( 'incompatible_sql_modes', $this->incompatible_modes );
 
-		foreach( $modes as $i => $mode ) {
+		foreach ( $modes as $i => $mode ) {
 			if ( in_array( $mode, $incompatible_modes ) ) {
 				unset( $modes[ $i ] );
 			}
@@ -108,10 +115,11 @@ class wpdb_mysqli extends wpdb {
 	 * @return null Always null.
 	 */
 	function select( $db, $dbh = null ) {
-		if ( is_null($dbh) )
+		if ( is_null($dbh) ) {
 			$dbh = $this->dbh;
+		}
 
-		if ( !@mysqli_select_db( $dbh, $db ) ) {
+		if ( ! @mysqli_select_db( $dbh, $db ) ) {
 			$this->ready = false;
 			wp_load_translations_early();
 			$this->bail( sprintf( __( '<h1>Can&#8217;t select database</h1>
@@ -152,33 +160,42 @@ class wpdb_mysqli extends wpdb {
 	function print_error( $str = '' ) {
 		global $EZSQL_ERROR;
 
-		if ( !$str )
+		if ( ! $str ) {
 			$str = mysqli_error( $this->dbh );
+		}
 		$EZSQL_ERROR[] = array( 'query' => $this->last_query, 'error_str' => $str );
 
-		if ( $this->suppress_errors )
+		if ( $this->suppress_errors ) {
 			return false;
+		}
 
 		wp_load_translations_early();
 
-		if ( $caller = $this->get_caller() )
+		if ( $caller = $this->get_caller() ) {
 			$error_str = sprintf( __( 'WordPress database error %1$s for query %2$s made by %3$s' ), $str, $this->last_query, $caller );
-		else
+		}
+		else {
 			$error_str = sprintf( __( 'WordPress database error %1$s for query %2$s' ), $str, $this->last_query );
+		}
 
 		error_log( $error_str );
 
 		// Are we showing errors?
-		if ( ! $this->show_errors )
+		if ( ! $this->show_errors ) {
 			return false;
+		}
 
 		// If there is an error then take note of it
 		if ( is_multisite() ) {
 			$msg = "WordPress database error: [$str]\n{$this->last_query}\n";
-			if ( defined( 'ERRORLOGFILE' ) )
+
+			if ( defined( 'ERRORLOGFILE' ) ) {
 				error_log( $msg, 3, ERRORLOGFILE );
-			if ( defined( 'DIEONDBERROR' ) )
+			}
+
+			if ( defined( 'DIEONDBERROR' ) ) {
 				wp_die( $msg );
+			}
 		} else {
 			$str   = htmlspecialchars( $str, ENT_QUOTES );
 			$query = htmlspecialchars( $this->last_query, ENT_QUOTES );
@@ -203,8 +220,9 @@ class wpdb_mysqli extends wpdb {
 		$this->rows_affected = $this->num_rows = 0;
 		$this->last_error  = '';
 
-		if ( is_resource( $this->result ) )
+		if ( is_resource( $this->result ) ) {
 			mysqli_free_result( $this->result );
+		}
 	}
 
 	/**
@@ -213,7 +231,6 @@ class wpdb_mysqli extends wpdb {
 	 * @since 3.0.0
 	 */
 	function db_connect( $allow_bail = true ) {
-
 		$this->is_mysql = true;
 
 		$new_link = defined( 'MYSQL_NEW_LINK' ) ? MYSQL_NEW_LINK : true;
@@ -271,8 +288,9 @@ class wpdb_mysqli extends wpdb {
 	 * @return int|false Number of rows affected/selected or false on error
 	 */
 	function query( $query ) {
-		if ( ! $this->ready )
+		if ( ! $this->ready ) {
 			return false;
+		}
 
 		// some queries are made before the plugins have been loaded, and thus cannot be filtered with this method
 		$query = apply_filters( 'query', $query );
@@ -286,14 +304,16 @@ class wpdb_mysqli extends wpdb {
 		// Keep track of the last query for debug..
 		$this->last_query = $query;
 
-		if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES )
+		if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES ) {
 			$this->timer_start();
+		}
 
 		$this->result = @mysqli_query( $this->dbh, $query );
 		$this->num_queries++;
 
-		if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES )
+		if ( defined( 'SAVEQUERIES' ) && SAVEQUERIES ) {
 			$this->queries[] = array( $query, $this->timer_stop(), $this->get_caller() );
+		}
 
 		// If there is an error then take note of it..
 		if ( $this->last_error = mysqli_error( $this->dbh ) ) {
@@ -335,8 +355,9 @@ class wpdb_mysqli extends wpdb {
 	 * @access protected
 	 */
 	protected function load_col_info() {
-		if ( $this->col_info )
+		if ( $this->col_info ) {
 			return;
+		}
 
 		for ( $i = 0; $i < @mysqli_num_fields( $this->result ); $i++ ) {
 			$this->col_info[ $i ] = @mysqli_fetch_field( $this->result, $i );
@@ -353,7 +374,9 @@ class wpdb_mysqli extends wpdb {
 	function db_version() {
 		return preg_replace( '/[^0-9.].*/', '', mysqli_get_server_info( $this->dbh ) );
 	}
+
 }
 
-if( function_exists( 'mysqli_connect' ) )
+if ( function_exists( 'mysqli_connect' ) ) {
 	$wpdb = new wpdb_mysqli( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
+}

@@ -22,11 +22,13 @@ class MySQLi_Manager {
 
 	public function deactivate_when_not_needed() {
 		global $wpdb, $wp_version;
+
 		if ( version_compare( $wp_version, '3.9-alpha-27234', '>=' ) && $wpdb->use_mysqli ) {
 			if ( is_admin() && ( ! defined('DOING_AJAX') || ! DOING_AJAX ) ) {
 				require_once ABSPATH . '/wp-admin/includes/plugin.php';
 				deactivate_plugins( __FILE__ );
-			    wp_die( sprintf( __('MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5. <a href="%s">Go back</a>', 'mysqli'), admin_url('/') ) );
+
+				wp_die( sprintf( __('MySQLi got deactivated cause it is now supported by WordPress when you are running PHP 5.5. <a href="%s">Go back</a>', 'mysqli'), admin_url('/') ) );
 			}
 		}
 	}
@@ -37,7 +39,7 @@ class MySQLi_Manager {
 	 * WP_Filesystem, because it's not available.
 	 */
 	public static function deactivate() {
-		if( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
+		if ( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
 			$crc1 = md5_file( dirname( __FILE__ ) . '/db.php' );
 			$crc2 = md5_file( WP_CONTENT_DIR . '/db.php' );
 
@@ -55,7 +57,7 @@ class MySQLi_Manager {
 	public static function uninstall() {
 		global $wp_filesystem;
 
-		if( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
+		if ( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
 			$crc1 = md5_file( dirname( __FILE__ ) . '/db.php' );
 			$crc2 = md5_file( WP_CONTENT_DIR . '/db.php' );
 
@@ -147,7 +149,7 @@ class MySQLi_Manager {
 		echo '<div class="tool-box"><h3 class="title">' . __( 'Current driver', 'mysqli' ) . '</h3></div>';
 		echo '<p>' . __( "The button below let's you install/remove the MySQLi drive" ) . '</p>';
 
-		if( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
+		if ( file_exists( WP_CONTENT_DIR . '/db.php' ) ) {
 			if ( version_compare( $wp_version, '3.9-alpha-27234', '<' ) ) {
 				$crc1 = md5_file( dirname( __FILE__ ) . '/db-legacy.php' );
 			}
@@ -163,7 +165,7 @@ class MySQLi_Manager {
 
 				echo '<p>';
 
-				if( function_exists( 'mysql' ) ) {
+				if ( function_exists( 'mysql' ) ) {
 					submit_button( __( 'Remove', 'mysqli' ), 'primary', 'install-db-php', false );
 				}
 
